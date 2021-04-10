@@ -1,16 +1,16 @@
 <template>
-  <HelloWorld />
+  <BlockHistory />
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import BlockHistory from './components/BlockHistory.vue';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    BlockHistory
   }
-}
+};
 </script>
 
 <style lang="scss">
