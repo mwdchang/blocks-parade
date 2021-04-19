@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import * as d3 from 'd3';
 import { ref } from 'vue';
 import BlockHistory from './components/BlockHistory.vue';
 import * as data from './assets/cleaned.json';
@@ -17,8 +18,8 @@ const BASE_H = 120;
 const TARGET_W = BASE_W * 2.0;
 const TARGET_H = BASE_H * 2.0;
 
-const TILE_W = 46 * 2;
-const TILE_H = 24 * 2;
+const TILE_W = 46;
+const TILE_H = 24;
 
 
 async function loadThumbnail(blocks, startIdx, endIdx, width, height) {
@@ -74,7 +75,6 @@ export default {
     };
   },
   mounted() {
-    console.log('mounted');
     this.refresh();
   },
   methods: {
@@ -97,8 +97,7 @@ export default {
       canvas2.height = TARGET_H;
       const ctx2 = canvas2.getContext('2d');
       ctx2.drawImage(canvas, 0, 0, TARGET_W, TARGET_H);
-      document.body.append(canvas2);
-
+      // document.body.append(canvas2);
       const targetImageData2X = ctx2.getImageData(0, 0, TARGET_W, TARGET_H);
 
       // 1. Load source images
@@ -129,6 +128,15 @@ export default {
           drawRGBA(canvas.getContext('2d'), tile, TILE_W, TILE_H);
           document.body.append(canvas);
           // canvas.getContext('2d').putImageData(blah, 0, 0);
+
+          d3.select(canvas)
+            .style('position', 'absolute')
+            .style('left', (Math.random() * 2000 - 1000) + 'px')
+            .style('top', (Math.random() * 2000 - 1000) + 'px')
+            .transition()
+            .duration(2000)
+            .style('left', 100 + i * TILE_W + 'px')
+            .style('top', 100 + j * TILE_H + 'px');
         }
         document.body.append(document.createElement('br'));
       }

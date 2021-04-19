@@ -44,7 +44,6 @@ export default {
     createTimeline(groupedBlocks) {
       const keys = Object.keys(groupedBlocks);
       const values = Object.values(groupedBlocks);
-      console.log(keys);
 
       const margin = ({ top: 20, right: 20, bottom: 20, left: 20 });
       const width = 1000;
