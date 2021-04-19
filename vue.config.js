@@ -1,3 +1,3 @@
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production' ? '/blockcollage/' : '/'
+  publicPath: process.env.NODE_ENV === 'production' ? '/blocks-parade/' : '/'
 };
