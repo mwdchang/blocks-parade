@@ -16,8 +16,11 @@ import BlockHistory from './components/BlockHistory.vue';
 import Mosaic from './components/Mosaic.vue';
 import * as data from './assets/cleaned.json';
 
+// const TARGET_INDEX = 15;
 // const TARGET_INDEX = 55;
 // const TARGET_INDEX = 255;
+// const TARGET_INDEX = 1833;
+// const TARGET_INDEX = 500;
 
 export default {
   name: 'App',

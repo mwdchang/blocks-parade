@@ -2,6 +2,7 @@
   <div style="display: flex">
     <div style="width: 320px">
       <div id="target-container"></div>
+      <div>{{ targetBlock.idx }} </div>
       <div>{{ targetBlock.description }} </div>
       <div>{{ targetBlock.userId }} </div>
       <div v-if="targetBlock.created_at">{{ targetBlock.created_at.split('T')[0] }} </div>
@@ -30,7 +31,11 @@ const TARGET_H = BASE_H * 2.0;
 const TILE_W = 23;
 const TILE_H = 12;
 
+// eslint-disable-next-line
 const DURATION = 2000;
+
+// eslint-disable-next-line
+const SAMPLE_RANGE = 25;
 
 const imageCache = new Map();
 
@@ -61,6 +66,7 @@ async function loadOne(blocks, idx, width, height) {
   return d;
 }
 
+// eslint-disable-next-line
 const drawRGBA = (ctx, data, w, h, x = 0, y = 0) => {
   const imageData = ctx.createImageData(w, h);
   for (let i = 0; i < data.length; i++) {
@@ -118,7 +124,7 @@ export default {
       d3.select('#explore-container').selectAll('*').remove();
 
 
-      const rootEl = document.getElementById('mosaic-container');
+      // const rootEl = document.getElementById('mosaic-container');
 
       // Load a random target
       // FIXME: Handle error
@@ -157,40 +163,50 @@ export default {
 
       // 2. Chop and run best matching tile
       // FIXME: Split into web-worker threads
+      const bestTiles = [];
       for (let i = 0; i < (TARGET_W / TILE_W); i++) {
         for (let j = 0; j < (TARGET_H / TILE_H); j++) {
           const tile = ImageUtil.crop(targetImageData2X.data,
             { width: TARGET_W, height: TARGET_H, channels: 4 },
             { x: i * TILE_W, y: j * TILE_H, width: TILE_W, height: TILE_H } // reverse W and H
           );
-
           const best = findBestImage(sourceImages, tile);
-          const canvas = document.createElement('canvas');
-          canvas.width = TILE_W;
-          canvas.height = TILE_H;
-          // drawRGBA(canvas.getContext('2d'), tile, TILE_W, TILE_H);
-          drawRGBA(canvas.getContext('2d'), best.imageData.data, TILE_W, TILE_H);
-          rootEl.append(canvas);
-
-          d3.select(canvas)
-            .style('position', 'absolute')
-            .style('opacity', 1)
-            .style('z-index', j * TILE_W + i)
-            .style('left', (Math.random() * 2000 - 1000) + 'px')
-            .style('top', (Math.random() * 2000 - 1000) + 'px')
-            .on('mouseover', () => {
-              this.showTile(best);
-            })
-            .on('click', () => {
-              console.log(best);
-              window.open(`http://bl.ocks.org/${best.userId}/${best.id}`, '_blank');
-            })
-            .transition()
-            .duration(DURATION)
-            .style('left', i * TILE_W + 'px')
-            .style('top', j * TILE_H + 'px');
+          bestTiles.push({
+            tile: best,
+            left: i * TILE_W,
+            top: j * TILE_H
+          });
         }
       }
+
+      // Animate in
+      d3.select('#mosaic-container')
+        .selectAll('.tile2')
+        .data(bestTiles)
+        .enter()
+        .append('canvas')
+        .classed('tile2', true)
+        .style('position', 'absolute')
+        .style('opacity', 1.0)
+        .style('left', (Math.random() * 200 - 100) + 'px')
+        .style('top', (Math.random() * 200 - 100) + 'px')
+        .attr('width', TILE_W + 'px')
+        .attr('height', TILE_H + 'px')
+        .on('mouseover', (event, d) => {
+          this.showTile(d.tile);
+        })
+        .on('click', (event, d) => {
+          window.open(`http://bl.ocks.org/${d.tile.userId}/${d.tile.id}`, '_blank');
+        })
+        .each(function(d) {
+          const canvas = d3.select(this).node();
+          drawRGBA(canvas.getContext('2d'), d.tile.imageData.data, TILE_W, TILE_H);
+        });
+      d3.selectAll('.tile2')
+        .transition()
+        .duration(DURATION)
+        .style('left', d => d.left + 'px')
+        .style('top', d => d.top + 'px');
     },
     async showTile(tile) {
       this.exploreBlock = tile;
