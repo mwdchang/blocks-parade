@@ -188,8 +188,8 @@ export default {
         .classed('tile2', true)
         .style('position', 'absolute')
         .style('opacity', 1.0)
-        .style('left', (Math.random() * 200 - 100) + 'px')
-        .style('top', (Math.random() * 200 - 100) + 'px')
+        .style('left', () => (Math.random() * 2000 - 1000) + 'px')
+        .style('top', () => (Math.random() * 2000 - 1000) + 'px')
         .attr('width', TILE_W + 'px')
         .attr('height', TILE_H + 'px')
         .on('mouseover', (event, d) => {
