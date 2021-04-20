@@ -86,6 +86,11 @@ export default {
     targetBlock: {},
     exploreBlock: {}
   }),
+  watch: {
+    targetIndex() {
+      this.refresh();
+    }
+  },
   mounted() {
     this.refresh();
   },
@@ -93,6 +98,11 @@ export default {
     async refresh() {
       const blocks = this.blocks;
       const targetIndex = this.targetIndex;
+
+      d3.select('#mosaic-container').selectAll('*').remove();
+      d3.select('#target-container').selectAll('*').remove();
+      d3.select('#explore-container').selectAll('*').remove();
+
 
       const rootEl = document.getElementById('mosaic-container');
 
@@ -117,7 +127,7 @@ export default {
       const targetImageData2X = ctx2.getImageData(0, 0, TARGET_W, TARGET_H);
 
       // 1. Load source images
-      const availableBlocks = await loadThumbnail(blocks, 140, 180, TILE_W, TILE_H);
+      const availableBlocks = await loadThumbnail(blocks, 140, 160, TILE_W, TILE_H);
       const sourceImages = [];
       for (let i = 0; i < availableBlocks.length; i++) {
         const b = availableBlocks[i];

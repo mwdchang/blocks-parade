@@ -6,7 +6,8 @@
     :blocks="blocks" />
   <BlockHistory
     v-if="blocks.length > 0"
-    :blocks="blocks" />
+    :blocks="blocks"
+    @range-changed="rangeChanged"/>
 </template>
 
 <script>
@@ -16,7 +17,7 @@ import Mosaic from './components/Mosaic.vue';
 import * as data from './assets/cleaned.json';
 
 // const TARGET_INDEX = 55;
-const TARGET_INDEX = 255;
+// const TARGET_INDEX = 255;
 
 export default {
   name: 'App',
@@ -25,7 +26,7 @@ export default {
   },
   setup() {
     const blocks = ref([]);
-    const targetIndex = ref(TARGET_INDEX);
+    const targetIndex = ref(null);
     return {
       blocks,
       targetIndex
@@ -37,7 +38,16 @@ export default {
   methods: {
     async refresh() {
       const blocks = data.default;
+      blocks.forEach((b, i) => {
+        b.idx = i;
+      });
       this.blocks = blocks;
+    },
+    rangeChanged(range) {
+      const [start, end] = range.map(Math.floor);
+
+      this.targetIndex = Math.floor(start + Math.random() * (end - start));
+      console.log('range', start, end);
     }
   }
 };

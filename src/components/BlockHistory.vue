@@ -30,6 +30,9 @@ export default {
     const svg = ref(null);
     return { svg };
   },
+  emits: [
+    'range-changed'
+  ],
   mounted() {
     this.refresh();
   },
@@ -52,9 +55,19 @@ export default {
       const svg = d3.select(this.svg)
         .attr('viewBox', [0, 0, width, height]);
 
+      const brushEnded = (event) => {
+        const selection = event.selection;
+        const [x0, x1] = selection.map(x.invert);
+
+        const start = values[Math.floor(x0)][0].idx;
+        const end = values[Math.floor(x1)][0].idx;
+
+        this.$emit('range-changed', [start, end]);
+      };
       const brush = d3.brushX()
         .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
-        .on('start brush end', brushed);
+        .on('start brush', brushed)
+        .on('end', brushEnded);
 
       const x = d3.scaleLinear([0, keys.length - 1], [margin.left, width - margin.right]);
       const xAxis = g => g
@@ -88,6 +101,7 @@ export default {
           .datum({ type: 'selection' })
           .on('mousedown touchstart', beforebrushstarted)
         );
+
 
 
       function brushed(event) {
