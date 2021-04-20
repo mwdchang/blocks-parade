@@ -1,13 +1,13 @@
 <template>
   <div style="display: flex">
-    <div>
+    <div style="width: 320px">
       <div id="target-container"></div>
       <div>{{ targetBlock.description }} </div>
       <div>{{ targetBlock.userId }} </div>
       <div v-if="targetBlock.created_at">{{ targetBlock.created_at.split('T')[0] }} </div>
     </div>
     <div id="mosaic-container"></div>
-    <div>
+    <div style="width: 320px">
       <div id="explorer-container"></div>
       <div>{{ exploreBlock.description }} </div>
       <div>{{ exploreBlock.userId }} </div>
@@ -38,6 +38,12 @@ async function loadThumbnail(blocks, startIdx, endIdx, width, height) {
   // FIXME use web-workers to speed it up, or preprocess
   const r = [];
   for (let i = startIdx; i <= endIdx; i++) {
+    if (blocks[i].imageData) {
+      console.log('cache hit', blocks[i].id);
+      r.push(blocks[i]);
+      continue;
+    }
+
     try {
       const d = await ImageUtil.loadImage(blocks[i].thumbnail, { width, height });
       blocks[i].imageData = d;
@@ -47,6 +53,12 @@ async function loadThumbnail(blocks, startIdx, endIdx, width, height) {
     }
   }
   return r;
+}
+
+
+async function loadOne(blocks, idx, width, height) {
+  const d = await ImageUtil.loadImage(blocks[idx].thumbnail, { width, height });
+  return d;
 }
 
 const drawRGBA = (ctx, data, w, h, x = 0, y = 0) => {
@@ -87,8 +99,10 @@ export default {
     exploreBlock: {}
   }),
   watch: {
-    targetIndex() {
-      this.refresh();
+    targetIndex(n) {
+      if (n) {
+        this.refresh();
+      }
     }
   },
   mounted() {
@@ -107,14 +121,18 @@ export default {
       const rootEl = document.getElementById('mosaic-container');
 
       // Load a random target
-      const target = (await loadThumbnail(blocks, targetIndex, targetIndex, 230, 120))[0];
-      this.targetBlock = target;
+      // FIXME: Handle error
+      let target = null;
+      target = await loadOne(blocks, targetIndex, 230, 120);
+
+      this.targetBlock = blocks[targetIndex];
+      console.log('target block', this.targetBlock);
       const canvas = document.createElement('canvas');
-      canvas.width = target.imageData.width;
-      canvas.height = target.imageData.height;
+      canvas.width = target.width;
+      canvas.height = target.height;
       canvas.style['z-index'] = 5;
 
-      canvas.getContext('2d').putImageData(target.imageData, 0, 0);
+      canvas.getContext('2d').putImageData(target, 0, 0);
       document.getElementById('target-container').append(canvas);
 
       // Make the target image 2X larger to better git
@@ -127,7 +145,10 @@ export default {
       const targetImageData2X = ctx2.getImageData(0, 0, TARGET_W, TARGET_H);
 
       // 1. Load source images
-      const availableBlocks = await loadThumbnail(blocks, 140, 160, TILE_W, TILE_H);
+      const start = Math.floor(Math.max(0, this.targetIndex - 25));
+      const end = Math.floor(Math.min(blocks.length - 1, this.targetIndex + 25));
+
+      const availableBlocks = await loadThumbnail(blocks, start, end, TILE_W, TILE_H);
       const sourceImages = [];
       for (let i = 0; i < availableBlocks.length; i++) {
         const b = availableBlocks[i];
