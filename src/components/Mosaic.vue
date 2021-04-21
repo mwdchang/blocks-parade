@@ -104,6 +104,7 @@ export default {
     targetBlock: {},
     exploreBlock: {}
   }),
+  emits: ['ready'],
   watch: {
     targetIndex(n) {
       if (n) {
@@ -178,6 +179,8 @@ export default {
           });
         }
       }
+
+      this.$emit('ready');
 
       // Animate in
       d3.select('#mosaic-container')
