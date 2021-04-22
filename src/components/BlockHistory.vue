@@ -82,17 +82,22 @@ export default {
       svg.selectAll('.tick').selectAll('line').remove();
       svg.selectAll('.domain').remove();
 
+      const bw = x(1) - x(0);
+
       svg.append('g')
-        .attr('fill-opacity', 0.2)
-        .selectAll('circle')
+        .selectAll('rect')
         .data(values)
-        .join('circle')
+        .join('rect')
         .attr('transform', (d, i) => {
-          return `translate(${x(i)}, 50)`;
+          return `translate(${x(i)}, 0)`;
         })
-        .attr('r', d => {
-          return Math.sqrt(d.length);
-        });
+        .attr('x', 0)
+        .attr('y', d => {
+          return 80 - 0.15 * d.length;
+        })
+        .attr('width', bw)
+        .attr('height', d => 0.15 * d.length)
+        .attr('fill', '#4b7');
 
       svg.append('g')
         .call(brush)
@@ -102,16 +107,7 @@ export default {
           .on('mousedown touchstart', beforebrushstarted)
         );
 
-
-
       function brushed(event) {
-        const selection = event.selection;
-        if (selection === null) {
-          // circle.attr('stroke', null);
-        } else {
-          // const [x0, x1] = selection.map(x.invert);
-          // circle.attr('stroke', d => x0 <= d && d <= x1 ? 'red' : null);
-        }
       }
 
       function beforebrushstarted(event) {

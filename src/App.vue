@@ -1,5 +1,10 @@
 <template>
-  <p>Blocks Parade: Celebrating 10 years of D3</p>
+  <h3>Blocks Parade</h3>
+  <p style="padding: 0 40px">
+    We celebrating 10 years of D3 by taking a stroll down memory lane and rediscover our favourite blocks.
+    As you change the selected range on the time-slider, a random block will be selected within the time frame,
+    then we will create a mosaic-tribute by recomposing the blocks by its neighouring blocks.
+  </p>
   <Mosaic
     v-if="blocks.length > 0"
     :targetIndex="targetIndex"
@@ -11,7 +16,9 @@
     @range-changed="rangeChanged"/>
   <div v-if="showOverlay"
     class="overlay">
-    <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+    <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+    </div>
+    Loading...
   </div>
 </template>
 
@@ -22,6 +29,7 @@ import Mosaic from './components/Mosaic.vue';
 import * as data from './assets/cleaned.json';
 
 // works nicely with mosaic
+// const TARGET_INDEX = 1808;
 // const TARGET_INDEX = 15;
 // const TARGET_INDEX = 55;
 // const TARGET_INDEX = 255;

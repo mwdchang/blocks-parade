@@ -179,7 +179,6 @@ export default {
           });
         }
       }
-
       this.$emit('ready');
 
       // Animate in
@@ -193,6 +192,7 @@ export default {
         .style('opacity', 1.0)
         .style('left', () => (Math.random() * 2000 - 1000) + 'px')
         .style('top', () => (Math.random() * 2000 - 1000) + 'px')
+        .style('cursor', 'pointer')
         .attr('width', TILE_W + 'px')
         .attr('height', TILE_H + 'px')
         .on('mouseover', (event, d) => {
@@ -217,7 +217,7 @@ export default {
       if (imageCache.has(tile.id)) {
         imageData = imageCache.get(tile.id);
       } else {
-        imageData = await ImageUtil.loadImage(tile.thumbnail, { BASE_W, BASE_H });
+        imageData = await ImageUtil.loadImage(tile.thumbnail, { width: BASE_W, height: BASE_H });
         imageCache.set(tile.id, imageData);
       }
       const explorer = document.getElementById('explorer-container');
