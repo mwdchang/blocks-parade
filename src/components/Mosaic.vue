@@ -187,9 +187,12 @@ export default {
         .data(bestTiles)
         .enter()
         .append('canvas')
-        .classed('tile2', true)
-        .classed('flip-z', Math.random() > 0.5)
-        .classed('flip-y', Math.random() > 0.5)
+        .attr('class', () => {
+          return 'tile2 ' + (Math.random() > 0.5 ? 'flip-z' : 'flip-y');
+        })
+        // .classed('tile2', true)
+        // .classed('flip-z', () => Math.random() > 0.5)
+        // .classed('flip-y', () => Math.random() > 0.5)
         .style('position', 'absolute')
         .style('opacity', 1.0)
         .style('left', () => (Math.random() * 2000 - 1000) + 'px')
@@ -265,7 +268,7 @@ export default {
     transform: rotateZ(180deg);
   }
   100% {
-    transform: rotateZ(0deg);
+    transform: rotateZ(359deg);
   }
 }
 

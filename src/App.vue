@@ -1,9 +1,20 @@
 <template>
-  <h3>Blocks Parade</h3>
+  <h3>Blocks Parade
+    <small style="display:inline-flex; align-items: center">
+      (&nbsp;
+      <img height="16" width="16" src="https://cdn.jsdelivr.net/npm/simple-icons@v4/icons/github.svg" />
+      &nbsp;
+      <a href="https://github.com/mwdchang/blocks-parade">
+       Source
+      </a>
+      &nbsp;)
+    </small>
+  </h3>
   <p style="padding: 0 40px">
-    We celebrating 10 years of D3 by taking a stroll down memory lane and rediscover our favourite blocks.
+    Celebrating 10 years of D3 by taking a stroll down memory lane and rediscover your favourite blocks.
     As you change the selected range on the time-slider, a random block will be selected within the time frame,
-    then we will create a mosaic-tribute by recomposing the blocks by its neighouring blocks.
+    then a mosaic-tribute will be created by recomposing the block by its neighouring blocks. Hover over the mosaic
+    tiles to see a larger version, click on the tiles to go to the block.
   </p>
   <Mosaic
     v-if="blocks.length > 0"
