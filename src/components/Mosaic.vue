@@ -32,7 +32,7 @@ const TILE_W = 23;
 const TILE_H = 12;
 
 // eslint-disable-next-line
-const DURATION = 2000;
+const DURATION = 4000;
 
 // eslint-disable-next-line
 const SAMPLE_RANGE = 25;
@@ -188,6 +188,8 @@ export default {
         .enter()
         .append('canvas')
         .classed('tile2', true)
+        .classed('flip-z', Math.random() > 0.5)
+        .classed('flip-y', Math.random() > 0.5)
         .style('position', 'absolute')
         .style('opacity', 1.0)
         .style('left', () => (Math.random() * 2000 - 1000) + 'px')
@@ -205,11 +207,14 @@ export default {
           const canvas = d3.select(this).node();
           drawRGBA(canvas.getContext('2d'), d.tile.imageData.data, TILE_W, TILE_H);
         });
-      d3.selectAll('.tile2')
+
+      await d3.selectAll('.tile2')
         .transition()
         .duration(DURATION)
         .style('left', d => d.left + 'px')
-        .style('top', d => d.top + 'px');
+        .style('top', d => d.top + 'px')
+        .end();
+      d3.selectAll('.tile2').classed('flip-z', false).classed('flip-y', false);
     },
     async showTile(tile) {
       this.exploreBlock = tile;
@@ -241,4 +246,53 @@ export default {
   width: 500px;
   margin: 5px 20px;
 }
+
+
+.flip-z {
+  animation: z-rotate 1s both infinite;
+}
+
+.flip-y {
+  animation: y-rotate 1s both infinite;
+}
+
+
+@keyframes z-rotate {
+  0 {
+    transform: rotateZ(0);
+  }
+  50% {
+    transform: rotateZ(180deg);
+  }
+  100% {
+    transform: rotateZ(0deg);
+  }
+}
+
+@keyframes y-rotate {
+  0 {
+    transform: rotateY(0);
+  }
+  50% {
+    transform: rotateY(180deg);
+  }
+  100% {
+    transform: rotateY(0deg);
+  }
+}
+
+
+/*
+@keyframes coin-rotate {
+  0 {
+    transform: rotateY(0) rotateX(30def);
+  }
+  50% {
+    transform: rotateY(180deg) rotateX(210deg);
+  }
+  100% {
+    transform: rotateY(0deg) rotateX(30deg);
+  }
+}
+*/
 </style>
