@@ -28,7 +28,6 @@ export default {
   watch: {
     seedIndex(n) {
       if (n === null) return;
-      this.moveOnly = true;
       this.moveTo(n);
     }
   },
@@ -74,11 +73,6 @@ export default {
         .attr('viewBox', [0, 0, width, height]);
 
       const brushEnded = (event) => {
-        if (this.moveOnly === true) {
-          this.moveOnly = false;
-          return;
-        }
-        this.moveOnly = false;
         const selection = event.selection;
         const [x0, x1] = selection.map(x.invert);
 

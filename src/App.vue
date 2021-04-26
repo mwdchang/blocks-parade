@@ -14,8 +14,10 @@
     Celebrating 10 years of D3 by taking a stroll down memory lane and rediscover your favourite blocks. Start by using the time slider below to select a sampling range.
     <br>
     Examples:
-    <button @click="seed(1808)">1808</button>
-    <button @click="seed(500)">500</button>
+    <button @click="seed(32)">#32</button>
+    <button @click="seed(500)">#500</button>
+    <button @click="seed(1808)">#1808</button>
+    <button @click="seed(2)">#2</button>
   </p>
   <BlockHistory
     v-if="blocks.length > 0"
@@ -27,15 +29,23 @@
     Hover over the tiles to see a larger version, click on the tiles to view them on http://bl.ocks.org/
   </p>
   <Mosaic
-    v-if="blocks.length > 0"
+    v-if="blocks.length > 0 && showError === false && targetIndex !== null"
     :targetIndex="targetIndex"
     :blocks="blocks"
+    @error="error"
     @ready="ready" />
+  <div v-if="showError === true">
+    <div style="font-size: 150%; color: #F40">
+      Cannot find image for block {{targetBlock.id}}, the data may have been changed or removed :(
+      <br>
+      Please make a different selection.
+    </div>
+  </div>
   <div v-if="showOverlay"
     class="overlay">
     <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
     </div>
-    Computing mosaic
+    Computing mosaic <br>
   </div>
 </template>
 
@@ -46,12 +56,10 @@ import Mosaic from './components/Mosaic.vue';
 import * as data from './assets/cleaned.json';
 
 // works nicely with mosaic
-// const TARGET_INDEX = 1808;
 // const TARGET_INDEX = 15;
 // const TARGET_INDEX = 55;
 // const TARGET_INDEX = 255;
 // const TARGET_INDEX = 1833;
-// const TARGET_INDEX = 500;
 
 export default {
   name: 'App',
@@ -62,15 +70,23 @@ export default {
   setup() {
     const blocks = ref([]);
     const showOverlay = ref(false);
+    const showError = ref(false);
     const targetIndex = ref(null);
     const seedIndex = ref(null);
+    window.blocks = blocks;
 
     return {
       blocks,
       targetIndex,
       seedIndex,
-      showOverlay
+      showOverlay,
+      showError
     };
+  },
+  computed: {
+    targetBlock() {
+      return this.blocks[this.targetIndex];
+    }
   },
   mounted() {
     this.refresh();
@@ -85,17 +101,27 @@ export default {
     },
     rangeChanged(range) {
       this.showOverlay = true;
+      this.showError = false;
       const [start, end] = range.map(Math.floor);
-      this.targetIndex = Math.floor(start + Math.random() * (end - start));
-      console.log('range', start, end);
+
+      if (this.seedIndex) {
+        this.targetIndex = this.seedIndex;
+      } else {
+        this.targetIndex = Math.floor(start + Math.random() * (end - start));
+      }
+      this.seedIndex = null;
     },
     seed(num) {
+      if (this.seedIndex === num) return;
       this.showOverlay = true;
       this.seedIndex = num;
-      this.targetIndex = num;
       console.log('seeding', num);
     },
     ready() {
+      this.showOverlay = false;
+    },
+    error() {
+      this.showError = true;
       this.showOverlay = false;
     }
   }

@@ -44,7 +44,6 @@ async function loadThumbnail(blocks, startIdx, endIdx, width, height) {
   const r = [];
   for (let i = startIdx; i <= endIdx; i++) {
     if (blocks[i].imageData) {
-      // console.log('cache hit', blocks[i].id);
       r.push(blocks[i]);
       continue;
     }
@@ -125,9 +124,13 @@ export default {
       d3.select('#explorer-container').selectAll('*').remove();
 
       // Load a random target
-      // FIXME: Handle error
       let target = null;
-      target = await loadOne(blocks, targetIndex, 230, 120);
+      try {
+        target = await loadOne(blocks, targetIndex, 230, 120);
+      } catch {
+        this.$emit('error');
+        return;
+      }
 
       this.targetBlock = blocks[targetIndex];
       console.log('target block', this.targetBlock);
