@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="border: 1px solid #434; box-sizing: border-box">
     <svg ref="svg"></svg>
   </div>
 </template>
@@ -9,21 +9,13 @@ import { ref } from 'vue';
 import _ from 'lodash';
 import * as d3 from 'd3';
 
-/*
-function test(el) {
-  d3.select(el)
-    .append('circle')
-    .attr('cx', 50)
-    .attr('cy', 50)
-    .attr('r', 20)
-    .attr('fill', '#f80');
-}
-*/
-
 export default {
   props: {
     blocks: {
       type: Array
+    },
+    seedIndex: {
+      type: Number
     }
   },
   setup() {
@@ -33,29 +25,60 @@ export default {
   emits: [
     'range-changed'
   ],
+  watch: {
+    seedIndex(n) {
+      if (n === null) return;
+      this.moveOnly = true;
+      this.moveTo(n);
+    }
+  },
   mounted() {
     this.refresh();
   },
   methods: {
     refresh() {
-      const groupedBlocks = _.groupBy(this.blocks, d => {
+      this.groupedBlocks = _.groupBy(this.blocks, d => {
         const t = d.created_at.split('-');
         return t[0] + '-' + t[1];
       });
-      this.createTimeline(groupedBlocks);
+      this.createTimeline(this.groupedBlocks);
+    },
+    moveTo(index) {
+      const brush = this.brush;
+      const x = this.x;
+
+      let gIdx = 0;
+      const values = Object.values(this.groupedBlocks);
+      const id = this.blocks[index].id;
+
+      for (let i = 0; i < values.length; i++) {
+        if (_.some(values[i], d => d.id === id)) {
+          gIdx = i;
+          break;
+        }
+      }
+      const start = Math.max(0, gIdx - 2);
+      const end = Math.min(gIdx + 2, this.blocks.length - 1);
+
+      d3.select('.brush').call(brush.move, [start, end].map(x));
     },
     createTimeline(groupedBlocks) {
       const keys = Object.keys(groupedBlocks);
       const values = Object.values(groupedBlocks);
 
-      const margin = ({ top: 20, right: 20, bottom: 20, left: 20 });
+      const margin = ({ top: 10, right: 30, bottom: 20, left: 30 });
       const width = 1000;
-      const height = 100;
+      const height = 90;
 
       const svg = d3.select(this.svg)
         .attr('viewBox', [0, 0, width, height]);
 
       const brushEnded = (event) => {
+        if (this.moveOnly === true) {
+          this.moveOnly = false;
+          return;
+        }
+        this.moveOnly = false;
         const selection = event.selection;
         const [x0, x1] = selection.map(x.invert);
 
@@ -64,17 +87,20 @@ export default {
 
         this.$emit('range-changed', [start, end]);
       };
-      const brush = d3.brushX()
+      this.brush = d3.brushX()
         .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
         .on('start brush', brushed)
         .on('end', brushEnded);
+      const brush = this.brush;
 
-      const x = d3.scaleLinear([0, keys.length - 1], [margin.left, width - margin.right]);
-      const xAxis = g => g
+      this.x = d3.scaleLinear([0, keys.length - 1], [margin.left, width - margin.right]);
+      const x = this.x;
+      this.xAxis = g => g
         .attr('transform', `translate(0, ${height - margin.bottom})`)
         .call(d3.axisBottom(x).tickValues([0, Math.floor(keys.length / 2), keys.length - 1]).tickFormat(d => {
           return keys[d];
         }));
+      const xAxis = this.xAxis;
 
       svg.append('g').call(xAxis);
 
@@ -83,6 +109,7 @@ export default {
       svg.selectAll('.domain').remove();
 
       const bw = x(1) - x(0);
+      const f = 0.17;
 
       svg.append('g')
         .selectAll('rect')
@@ -93,13 +120,14 @@ export default {
         })
         .attr('x', 0)
         .attr('y', d => {
-          return 80 - 0.15 * d.length;
+          return 70 - f * d.length;
         })
         .attr('width', bw)
-        .attr('height', d => 0.15 * d.length)
+        .attr('height', d => f * d.length)
         .attr('fill', '#4b7');
 
       svg.append('g')
+        .classed('brush', true)
         .call(brush)
         .call(brush.move, [0, 5].map(x))
         .call(g => g.select('.overlay')

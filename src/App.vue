@@ -1,35 +1,41 @@
 <template>
   <h3>Blocks Parade
-    <small style="display:inline-flex; align-items: center">
-      (&nbsp;
+    <small style="display:inline-flex; align-items: center; background: #DDD">
+      &nbsp;
       <img height="16" width="16" src="https://cdn.jsdelivr.net/npm/simple-icons@v4/icons/github.svg" />
       &nbsp;
       <a href="https://github.com/mwdchang/blocks-parade">
        Source
       </a>
-      &nbsp;)
+      &nbsp;
     </small>
   </h3>
   <p style="padding: 0 40px">
-    Celebrating 10 years of D3 by taking a stroll down memory lane and rediscover your favourite blocks.
-    As you change the selected range on the time-slider, a random block will be selected within the time frame,
-    then a mosaic-tribute will be created by recomposing the block by its neighouring blocks. Hover over the mosaic
-    tiles to see a larger version, click on the tiles to go to the block.
+    Celebrating 10 years of D3 by taking a stroll down memory lane and rediscover your favourite blocks. Start by using the time slider below to select a sampling range.
+    <br>
+    Examples:
+    <button @click="seed(1808)">1808</button>
+    <button @click="seed(500)">500</button>
+  </p>
+  <BlockHistory
+    v-if="blocks.length > 0"
+    :seedIndex="seedIndex"
+    :blocks="blocks"
+    @range-changed="rangeChanged"/>
+  <p style="padding: 0 40px">
+    Other blocks in the time range wil be used as tiles to create a moasica in the likeliness of the chosen block.
+    Hover over the tiles to see a larger version, click on the tiles to view them on http://bl.ocks.org/
   </p>
   <Mosaic
     v-if="blocks.length > 0"
     :targetIndex="targetIndex"
     :blocks="blocks"
     @ready="ready" />
-  <BlockHistory
-    v-if="blocks.length > 0"
-    :blocks="blocks"
-    @range-changed="rangeChanged"/>
   <div v-if="showOverlay"
     class="overlay">
     <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
     </div>
-    Loading...
+    Computing mosaic
   </div>
 </template>
 
@@ -57,9 +63,12 @@ export default {
     const blocks = ref([]);
     const showOverlay = ref(false);
     const targetIndex = ref(null);
+    const seedIndex = ref(null);
+
     return {
       blocks,
       targetIndex,
+      seedIndex,
       showOverlay
     };
   },
@@ -80,6 +89,12 @@ export default {
       this.targetIndex = Math.floor(start + Math.random() * (end - start));
       console.log('range', start, end);
     },
+    seed(num) {
+      this.showOverlay = true;
+      this.seedIndex = num;
+      this.targetIndex = num;
+      console.log('seeding', num);
+    },
     ready() {
       this.showOverlay = false;
     }
@@ -88,6 +103,23 @@ export default {
 </script>
 
 <style lang="scss">
+
+body {
+  background: #112;
+}
+
+h3 {
+  margin: 0 10px;
+}
+
+p, h3, div {
+  color: #EEE2EE;
+}
+
+small {
+  border-radius: 2px;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -103,10 +135,12 @@ export default {
   width: 100vw;
   height: 100vh;
   background: #eee;
-  opacity: 0.5;
+  opacity: 0.6;
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 225%;
+  color: #222;
 }
 
 // see https://loading.io/css/
@@ -176,5 +210,9 @@ export default {
   50% {
     opacity: 0.5;
   }
+}
+
+p {
+  font-size: 85%;
 }
 </style>

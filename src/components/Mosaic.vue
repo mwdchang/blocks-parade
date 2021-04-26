@@ -1,5 +1,5 @@
 <template>
-  <div style="display: flex">
+  <div style="display: flex; border: 1px #434 solid; padding: 10px 10px; justify-content: center">
     <div style="width: 320px">
       <div id="target-container"></div>
       <div>{{ targetBlock.idx }} </div>
@@ -32,7 +32,7 @@ const TILE_W = 23;
 const TILE_H = 12;
 
 // eslint-disable-next-line
-const DURATION = 4000;
+const DURATION = 3500;
 
 // eslint-disable-next-line
 const SAMPLE_RANGE = 25;
@@ -44,7 +44,7 @@ async function loadThumbnail(blocks, startIdx, endIdx, width, height) {
   const r = [];
   for (let i = startIdx; i <= endIdx; i++) {
     if (blocks[i].imageData) {
-      console.log('cache hit', blocks[i].id);
+      // console.log('cache hit', blocks[i].id);
       r.push(blocks[i]);
       continue;
     }
@@ -122,10 +122,7 @@ export default {
 
       d3.select('#mosaic-container').selectAll('*').remove();
       d3.select('#target-container').selectAll('*').remove();
-      d3.select('#explore-container').selectAll('*').remove();
-
-
-      // const rootEl = document.getElementById('mosaic-container');
+      d3.select('#explorer-container').selectAll('*').remove();
 
       // Load a random target
       // FIXME: Handle error
@@ -169,7 +166,7 @@ export default {
         for (let j = 0; j < (TARGET_H / TILE_H); j++) {
           const tile = ImageUtil.crop(targetImageData2X.data,
             { width: TARGET_W, height: TARGET_H, channels: 4 },
-            { x: i * TILE_W, y: j * TILE_H, width: TILE_W, height: TILE_H } // reverse W and H
+            { x: i * TILE_W, y: j * TILE_H, width: TILE_W, height: TILE_H }
           );
           const best = findBestImage(sourceImages, tile);
           bestTiles.push({
@@ -188,13 +185,17 @@ export default {
         .enter()
         .append('canvas')
         .attr('class', () => {
-          return 'tile2 ' + (Math.random() > 0.5 ? 'flip-z' : 'flip-y');
+          const r = Math.random();
+          if (r < 0.33) {
+            return 'tile2 flip-z';
+          } else if (r < 0.66) {
+            return 'tile2 flip-y';
+          }
+          return 'tile2';
         })
-        // .classed('tile2', true)
-        // .classed('flip-z', () => Math.random() > 0.5)
-        // .classed('flip-y', () => Math.random() > 0.5)
         .style('position', 'absolute')
         .style('opacity', 1.0)
+        .style('border', '1px solid #434')
         .style('left', () => (Math.random() * 2000 - 1000) + 'px')
         .style('top', () => (Math.random() * 2000 - 1000) + 'px')
         .style('cursor', 'pointer')
@@ -247,16 +248,16 @@ export default {
   position: relative;
   height: 250px;
   width: 500px;
-  margin: 5px 20px;
+  margin: 0px 20px;
 }
 
 
 .flip-z {
-  animation: z-rotate 1s both infinite;
+  animation: z-rotate 1.2s both infinite;
 }
 
 .flip-y {
-  animation: y-rotate 1s both infinite;
+  animation: y-rotate 1.2s both infinite;
 }
 
 
@@ -283,19 +284,4 @@ export default {
     transform: rotateY(0deg);
   }
 }
-
-
-/*
-@keyframes coin-rotate {
-  0 {
-    transform: rotateY(0) rotateX(30def);
-  }
-  50% {
-    transform: rotateY(180deg) rotateX(210deg);
-  }
-  100% {
-    transform: rotateY(0deg) rotateX(30deg);
-  }
-}
-*/
 </style>
