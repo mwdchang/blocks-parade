@@ -1,14 +1,21 @@
 <template>
   <div style="display: flex; border: 1px #434 solid; padding: 10px 10px; justify-content: center">
-    <div style="width: 320px">
+    <div style="width: 320px; font-size: 85%">
       <div id="target-container"></div>
       <div>{{ targetBlock.idx }} </div>
       <div>{{ targetBlock.description }} </div>
       <div>{{ targetBlock.userId }} </div>
       <div v-if="targetBlock.created_at">{{ targetBlock.created_at.split('T')[0] }} </div>
+      <div style="margin-top: 10px">
+        <div style="font-size: 150%"
+          class="button">Shuffle</div>
+        <div style="font-size: 150%"
+          class="button"
+          @click="createMosaic()">Create Mosaic !!</div>
+      </div>
     </div>
     <div id="mosaic-container"></div>
-    <div style="width: 320px">
+    <div style="width: 320px; font-size: 85%">
       <div id="explorer-container"></div>
       <div>{{ exploreBlock.description }} </div>
       <div>{{ exploreBlock.userId }} </div>
@@ -32,7 +39,7 @@ const TILE_W = 23;
 const TILE_H = 12;
 
 // eslint-disable-next-line
-const DURATION = 3500;
+const DURATION = 3600;
 
 // eslint-disable-next-line
 const SAMPLE_RANGE = 25;
@@ -149,7 +156,12 @@ export default {
       canvas2.height = TARGET_H;
       const ctx2 = canvas2.getContext('2d');
       ctx2.drawImage(canvas, 0, 0, TARGET_W, TARGET_H);
-      const targetImageData2X = ctx2.getImageData(0, 0, TARGET_W, TARGET_H);
+      this.targetImageData2X = ctx2.getImageData(0, 0, TARGET_W, TARGET_H);
+      this.$emit('ready');
+    },
+    async createMosaic() {
+      this.$emit('working');
+      const blocks = this.blocks;
 
       // 1. Load source images
       const start = Math.floor(Math.max(0, this.targetIndex - 25));
@@ -167,7 +179,7 @@ export default {
       const bestTiles = [];
       for (let i = 0; i < (TARGET_W / TILE_W); i++) {
         for (let j = 0; j < (TARGET_H / TILE_H); j++) {
-          const tile = ImageUtil.crop(targetImageData2X.data,
+          const tile = ImageUtil.crop(this.targetImageData2X.data,
             { width: TARGET_W, height: TARGET_H, channels: 4 },
             { x: i * TILE_W, y: j * TILE_H, width: TILE_W, height: TILE_H }
           );
@@ -256,11 +268,11 @@ export default {
 
 
 .flip-z {
-  animation: z-rotate 1.2s both infinite;
+  animation: z-rotate 1.8s both infinite;
 }
 
 .flip-y {
-  animation: y-rotate 1.2s both infinite;
+  animation: y-rotate 1.8s both infinite;
 }
 
 

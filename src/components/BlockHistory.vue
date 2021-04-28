@@ -91,7 +91,15 @@ export default {
       const x = this.x;
       this.xAxis = g => g
         .attr('transform', `translate(0, ${height - margin.bottom})`)
-        .call(d3.axisBottom(x).tickValues([0, Math.floor(keys.length / 2), keys.length - 1]).tickFormat(d => {
+        .call(d3.axisBottom(x).tickValues(
+          [
+            0,
+            Math.floor(keys.length / 4),
+            Math.floor(keys.length / 2),
+            Math.floor(3 * keys.length / 4),
+            keys.length - 1
+          ]
+        ).tickFormat(d => {
           return keys[d];
         }));
       const xAxis = this.xAxis;
@@ -123,7 +131,7 @@ export default {
       svg.append('g')
         .classed('brush', true)
         .call(brush)
-        .call(brush.move, [0, 5].map(x))
+        .call(brush.move, [60, 65].map(x))
         .call(g => g.select('.overlay')
           .datum({ type: 'selection' })
           .on('mousedown touchstart', beforebrushstarted)

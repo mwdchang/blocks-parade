@@ -1,51 +1,62 @@
 <template>
-  <h3>Blocks Parade
-    <small style="display:inline-flex; align-items: center; background: #DDD">
-      &nbsp;
-      <img height="16" width="16" src="https://cdn.jsdelivr.net/npm/simple-icons@v4/icons/github.svg" />
-      &nbsp;
-      <a href="https://github.com/mwdchang/blocks-parade">
-       Source
-      </a>
-      &nbsp;
-    </small>
-  </h3>
-  <p style="padding: 0 40px">
-    Celebrating 10 years of D3 by taking a stroll down memory lane and rediscover your favourite blocks. Start by using the time slider below to select a sampling range.
-    <br>
-    Examples:
-    <button @click="seed(32)">#32</button>
-    <button @click="seed(500)">#500</button>
-    <button @click="seed(1808)">#1808</button>
-    <button @click="seed(2)">#2</button>
-  </p>
-  <BlockHistory
-    v-if="blocks.length > 0"
-    :seedIndex="seedIndex"
-    :blocks="blocks"
-    @range-changed="rangeChanged"/>
-  <p style="padding: 0 40px">
-    Other blocks in the time range wil be used as tiles to create a moasica in the likeliness of the chosen block.
-    Hover over the tiles to see a larger version, click on the tiles to view them on http://bl.ocks.org/
-  </p>
-  <Mosaic
-    v-if="blocks.length > 0 && showError === false && targetIndex !== null"
-    :targetIndex="targetIndex"
-    :blocks="blocks"
-    @error="error"
-    @ready="ready" />
-  <div v-if="showError === true">
-    <div style="font-size: 150%; color: #F40">
-      Cannot find image for block {{targetBlock.id}}, the data may have been changed or removed :(
-      <br>
-      Please make a different selection.
+  <div style="display:flex; flex-direction: column; justify-content: space-evenly">
+    <h3>Blocks Parade
+      <small style="display:inline-flex; justify-content: center; align-items: center; background: #DDD">
+        &nbsp;
+        <img height="16" width="16" src="https://cdn.jsdelivr.net/npm/simple-icons@v4/icons/github.svg" />
+        &nbsp;
+        <a style="text-decoration: inherit" href="https://github.com/mwdchang/blocks-parade" target="_blank">
+         Source
+        </a>
+        &nbsp;
+      </small>
+    </h3>
+    <div style="padding: 0 40px; font-size: 85%; margin-top: 10px">
+      Celebrating 10 years of D3.js by taking a stroll down memory lane and rediscover your favourite blocks.
+      Start by using the range slider below to select a time range.
     </div>
-  </div>
-  <div v-if="showOverlay"
-    class="overlay">
-    <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+    <div style="padding: 0 40px; font-size: 85%; margin-top: 5px">
+      Or start with one of these examples:
+      <div class="button" @click="seed(32)">#32</div>
+      <div class="button" @click="seed(255)">#255</div>
+      <div class="button" @click="seed(500)">#500</div>
+      <div class="button" @click="seed(1808)">#1808</div>
+      <div class="button" @click="seed(3797)">#3797</div>
+      <div class="button" @click="seed(6390)">#6390</div>
+      <div class="button" @click="seed(10104)">#10104</div>
+      <div class="button" @click="seed(2)">#2</div>
     </div>
-    Computing mosaic <br>
+    <BlockHistory
+      v-if="blocks.length > 0"
+      style="margin-top: 5px"
+      :seedIndex="seedIndex"
+      :blocks="blocks"
+      @range-changed="rangeChanged"/>
+    <p style="padding: 0 40px">
+      There are <span style="font-size: 120%">{{ numBlocksInRange }}</span> blocks in your selected time range!!<br>
+      Click <em>Shuffle</em> to browse them.  click <em>Create Mosaic!!</em>to create a mosaic using the neighouring blocks. <br>
+      Once the mosaic is created, hover over the tiles to see a larger version, click on the tiles to view them on http://bl.ocks.org/
+    </p>
+    <Mosaic
+      v-if="blocks.length > 0 && showError === false && targetIndex !== null"
+      :targetIndex="targetIndex"
+      :blocks="blocks"
+      @error="error"
+      @working="working"
+      @ready="ready" />
+    <div v-if="showError === true">
+      <div style="font-size: 150%; color: #F40">
+        Oops! We cannot find the image for block {{targetBlock.id}}, the data may have been changed or removed :(
+        <br>
+        Please make a different selection.
+      </div>
+    </div>
+    <div v-if="showOverlay"
+      class="overlay">
+      <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+      </div>
+      Computing mosaic <br>
+    </div>
   </div>
 </template>
 
@@ -73,6 +84,7 @@ export default {
     const showError = ref(false);
     const targetIndex = ref(null);
     const seedIndex = ref(null);
+    const numBlocksInRange = ref(0);
     window.blocks = blocks;
 
     return {
@@ -80,7 +92,8 @@ export default {
       targetIndex,
       seedIndex,
       showOverlay,
-      showError
+      showError,
+      numBlocksInRange
     };
   },
   computed: {
@@ -100,9 +113,11 @@ export default {
       this.blocks = blocks;
     },
     rangeChanged(range) {
-      this.showOverlay = true;
+      // this.showOverlay = true;
       this.showError = false;
       const [start, end] = range.map(Math.floor);
+
+      this.numBlocksInRange = (end - start) + 1;
 
       if (this.seedIndex) {
         this.targetIndex = this.seedIndex;
@@ -113,9 +128,8 @@ export default {
     },
     seed(num) {
       if (this.seedIndex === num) return;
-      this.showOverlay = true;
+      // this.showOverlay = true;
       this.seedIndex = num;
-      console.log('seeding', num);
     },
     ready() {
       this.showOverlay = false;
@@ -123,6 +137,9 @@ export default {
     error() {
       this.showError = true;
       this.showOverlay = false;
+    },
+    working() {
+      this.showOverlay = true;
     }
   }
 };
@@ -240,5 +257,16 @@ small {
 
 p {
   font-size: 85%;
+}
+
+.button {
+  display: inline-block;
+  border-radius: 5px;
+  background: #369;
+  padding: 2px;
+  font-size: 85%;
+  margin: 0 2px;
+  padding: 2px 6px;
+  cursor: pointer;
 }
 </style>
