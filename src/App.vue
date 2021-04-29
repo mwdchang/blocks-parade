@@ -12,7 +12,7 @@
       </small>
     </h3>
     <div style="padding: 0 40px; font-size: 85%; margin-top: 10px">
-      Celebrating 10 years of D3.js by taking a stroll down memory lane and rediscover your favourite blocks.
+      Let's celebrating 10 years of D3.js by taking a stroll down memory lane and rediscover your favourite blocks.
       Start by using the range slider below to select a time range.
     </div>
     <div style="padding: 0 40px; font-size: 85%; margin-top: 5px">
@@ -24,7 +24,9 @@
       <div class="button" @click="seed(3797)">#3797</div>
       <div class="button" @click="seed(6390)">#6390</div>
       <div class="button" @click="seed(10104)">#10104</div>
+      <!--
       <div class="button" @click="seed(2)">#2</div>
+      -->
     </div>
     <BlockHistory
       v-if="blocks.length > 0"
@@ -38,12 +40,14 @@
       Once the mosaic is created, hover over the tiles to see a larger version, click on the tiles to view them on http://bl.ocks.org/
     </p>
     <Mosaic
-      v-if="blocks.length > 0 && showError === false && targetIndex !== null"
+      v-if="blocks.length > 0 && targetIndex !== null"
       :targetIndex="targetIndex"
       :blocks="blocks"
+      @shuffle="shuffle"
       @error="error"
       @working="working"
       @ready="ready" />
+    <!--
     <div v-if="showError === true">
       <div style="font-size: 150%; color: #F40">
         Oops! We cannot find the image for block {{targetBlock.id}}, the data may have been changed or removed :(
@@ -51,11 +55,12 @@
         Please make a different selection.
       </div>
     </div>
+    -->
     <div v-if="showOverlay"
       class="overlay">
       <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
       </div>
-      Computing mosaic <br>
+      Creating mosaic <br>
     </div>
   </div>
 </template>
@@ -85,6 +90,8 @@ export default {
     const targetIndex = ref(null);
     const seedIndex = ref(null);
     const numBlocksInRange = ref(0);
+    const start = ref(0);
+    const end = ref(1);
     window.blocks = blocks;
 
     return {
@@ -93,7 +100,9 @@ export default {
       seedIndex,
       showOverlay,
       showError,
-      numBlocksInRange
+      numBlocksInRange,
+      start,
+      end
     };
   },
   computed: {
@@ -116,6 +125,8 @@ export default {
       // this.showOverlay = true;
       this.showError = false;
       const [start, end] = range.map(Math.floor);
+      this.start = start;
+      this.end = end;
 
       this.numBlocksInRange = (end - start) + 1;
 
@@ -124,6 +135,12 @@ export default {
       } else {
         this.targetIndex = Math.floor(start + Math.random() * (end - start));
       }
+      this.seedIndex = null;
+    },
+    shuffle() {
+      const start = this.start;
+      const end = this.end;
+      this.targetIndex = Math.floor(start + Math.random() * (end - start));
       this.seedIndex = null;
     },
     seed(num) {
@@ -266,7 +283,12 @@ p {
   padding: 2px;
   font-size: 85%;
   margin: 0 2px;
-  padding: 2px 6px;
+  padding: 3px 7px;
   cursor: pointer;
+  min-width: 25px;
+}
+
+.button:hover {
+  opacity: 0.75;
 }
 </style>

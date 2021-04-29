@@ -1,14 +1,26 @@
 <template>
   <div style="display: flex; border: 1px #434 solid; padding: 10px 10px; justify-content: center">
     <div style="width: 320px; font-size: 85%">
-      <div id="target-container"></div>
-      <div>{{ targetBlock.idx }} </div>
-      <div>{{ targetBlock.description }} </div>
-      <div>{{ targetBlock.userId }} </div>
-      <div v-if="targetBlock.created_at">{{ targetBlock.created_at.split('T')[0] }} </div>
+      <div
+        v-if="showError === false"
+        id="target-container">
+      </div>
+      <div v-if="showError === true">
+        <div style="font-size: 150%; color: #F60">
+          Oops! We cannot find the image for block {{targetBlock.id}}, the data may have been changed or removed :(
+          <br>Please try a different block.
+        </div>
+      </div>
+      <!--
+      <div v-if="showError === false">{{ targetBlock.idx }} </div>
+      -->
+      <div v-if="showError === false">{{ targetBlock.description }} </div>
+      <div v-if="showError === false"><em><strong>{{ targetBlock.userId }}</strong></em></div>
+      <div v-if="showError === false && targetBlock.created_at">{{ targetBlock.created_at.split('T')[0] }} </div>
       <div style="margin-top: 10px">
-        <div style="font-size: 150%"
-          class="button">Shuffle</div>
+        <div style="font-size: 150%; background: #798"
+          class="button"
+          @click="shuffle()">Shuffle</div>
         <div style="font-size: 150%"
           class="button"
           @click="createMosaic()">Create Mosaic !!</div>
@@ -18,7 +30,7 @@
     <div style="width: 320px; font-size: 85%">
       <div id="explorer-container"></div>
       <div>{{ exploreBlock.description }} </div>
-      <div>{{ exploreBlock.userId }} </div>
+      <div><em><strong>{{ exploreBlock.userId }}</strong></em></div>
       <div v-if="exploreBlock.created_at">{{ exploreBlock.created_at.split('T')[0] }} </div>
     </div>
   </div>
@@ -108,7 +120,8 @@ export default {
   },
   data: () => ({
     targetBlock: {},
-    exploreBlock: {}
+    exploreBlock: {},
+    showError: false
   }),
   emits: ['ready'],
   watch: {
@@ -129,18 +142,20 @@ export default {
       d3.select('#mosaic-container').selectAll('*').remove();
       d3.select('#target-container').selectAll('*').remove();
       d3.select('#explorer-container').selectAll('*').remove();
+      this.exploreBlock = {};
 
       // Load a random target
       let target = null;
       try {
         target = await loadOne(blocks, targetIndex, 230, 120);
       } catch {
+        this.showError = true;
         this.$emit('error');
         return;
       }
 
       this.targetBlock = blocks[targetIndex];
-      console.log('target block', this.targetBlock);
+      // console.log('target block', this.targetBlock);
       const canvas = document.createElement('canvas');
       canvas.width = target.width;
       canvas.height = target.height;
@@ -158,6 +173,10 @@ export default {
       ctx2.drawImage(canvas, 0, 0, TARGET_W, TARGET_H);
       this.targetImageData2X = ctx2.getImageData(0, 0, TARGET_W, TARGET_H);
       this.$emit('ready');
+    },
+    async shuffle() {
+      this.showError = false;
+      this.$emit('shuffle');
     },
     async createMosaic() {
       this.$emit('working');
@@ -264,6 +283,10 @@ export default {
   height: 250px;
   width: 500px;
   margin: 0px 20px;
+}
+
+#target-container {
+  min-height: 120px
 }
 
 

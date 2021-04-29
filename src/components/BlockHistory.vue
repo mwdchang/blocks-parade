@@ -72,14 +72,31 @@ export default {
       const svg = d3.select(this.svg)
         .attr('viewBox', [0, 0, width, height]);
 
+      this.x = d3.scaleLinear([0, keys.length - 1], [margin.left, width - margin.right]);
+      const x = this.x;
+
       const brushEnded = (event) => {
         const selection = event.selection;
         const [x0, x1] = selection.map(x.invert);
 
-        const start = values[Math.floor(x0)][0].idx;
-        const end = values[Math.floor(x1)][0].idx;
+        const startGIndex = Math.round(x0);
+        const endGIndex = Math.floor(x1);
 
+        const start = _.first(values[startGIndex]).idx;
+        const end = _.last(values[endGIndex]).idx;
         this.$emit('range-changed', [start, end]);
+
+        /*
+        svg.selectAll('.temp-marker').remove();
+        for (let i = startGIndex; i <= endGIndex; i++) {
+          svg.append('circle')
+            .classed('temp-marker', true)
+            .attr('cx', x(i))
+            .attr('cy', 74)
+            .attr('r', 1.25)
+            .attr('fill', '#eee');
+        }
+        */
       };
       this.brush = d3.brushX()
         .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
@@ -87,8 +104,6 @@ export default {
         .on('end', brushEnded);
       const brush = this.brush;
 
-      this.x = d3.scaleLinear([0, keys.length - 1], [margin.left, width - margin.right]);
-      const x = this.x;
       this.xAxis = g => g
         .attr('transform', `translate(0, ${height - margin.bottom})`)
         .call(d3.axisBottom(x).tickValues(
@@ -111,7 +126,7 @@ export default {
       svg.selectAll('.domain').remove();
 
       const bw = x(1) - x(0);
-      const f = 0.17;
+      const f = 0.16;
 
       svg.append('g')
         .selectAll('rect')
@@ -125,8 +140,9 @@ export default {
           return 70 - f * d.length;
         })
         .attr('width', bw)
-        .attr('height', d => f * d.length)
-        .attr('fill', '#4b7');
+        .attr('height', d => 1 + f * d.length)
+        .attr('fill', '#4ba')
+        .attr('stroke', '#000');
 
       svg.append('g')
         .classed('brush', true)
@@ -136,6 +152,13 @@ export default {
           .datum({ type: 'selection' })
           .on('mousedown touchstart', beforebrushstarted)
         );
+
+      svg.append('text')
+        .attr('x', 15)
+        .attr('y', 15)
+        .style('fill', '#eee2ee')
+        .style('font-size', '10px')
+        .text('10 years of bl.ocks, by month');
 
       function brushed(event) {
       }
@@ -157,7 +180,7 @@ export default {
 <style scoped lang="scss">
 svg {
   /deep/ .tick {
-    opacity: 0.5;
+    opacity: 0.6;
   }
 }
 </style>
