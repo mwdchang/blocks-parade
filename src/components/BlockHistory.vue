@@ -1,5 +1,5 @@
 <template>
-  <div style="border: 1px solid #434; box-sizing: border-box">
+  <div style="box-sizing: border-box">
     <svg ref="svg"></svg>
   </div>
 </template>
@@ -158,6 +158,7 @@ export default {
         .attr('y', 15)
         .style('fill', '#eee2ee')
         .style('font-size', '10px')
+        .style('opacity', 0.7)
         .text('10 years of bl.ocks, by month');
 
       function brushed(event) {
@@ -180,7 +181,7 @@ export default {
 <style scoped lang="scss">
 svg {
   /deep/ .tick {
-    opacity: 0.6;
+    opacity: 0.7;
   }
 }
 </style>

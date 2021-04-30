@@ -178,6 +178,7 @@ export default {
 
       // Load a random target
       let target = null;
+      this.showError = false;
       try {
         target = await loadOne(blocks, targetIndex, 230, 120);
       } catch {
@@ -209,7 +210,8 @@ export default {
     async collapseTiles() {
       d3.select('#mosaic-container').select('.help-text').remove();
       d3.select('#mosaic-container').selectAll('.tile2').classed('tile2', false).each(function() {
-        d3.select(this).transition().duration(800 + Math.random() * 200).style('top', 270 + Math.random() * 500 + 'px').remove();
+        const top = parseFloat(d3.select(this).style('top'));
+        d3.select(this).transition().duration(800 + Math.random() * 250).style('top', top + Math.random() * 400 + 'px').remove();
       });
     },
     async shuffle() {

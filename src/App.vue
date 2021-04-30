@@ -15,28 +15,31 @@
       Let's celebrating 10 years of D3.js by taking a stroll down memory lane and rediscover your favourite bl.ocks.
       Start by using the range slider below to select a time range.
     </div>
-    <div v-if="blocks.length > 0" style="padding: 0 40px; font-size: 85%; margin-top: 5px">
+    <div v-if="blocks.length > 0" style="padding: 0 40px; font-size: 85%; margin-top: 5px; margin-bottom: 5px">
       Or start with one of these examples:
+      <div class="button" @click="seed(4161)" style="display: inline-flex; padding: 5px 5px">
+        <img :src="blocks[4161].thumbnail" width="46" height="24" />
+      </div>
       <div class="button" @click="seed(255)" style="display: inline-flex; padding: 5px 5px">
-        <img :src="blocks[255].thumbnail" width="35" height="18" />
+        <img :src="blocks[255].thumbnail" width="46" height="24" />
       </div>
       <div class="button" @click="seed(500)" style="display: inline-flex; padding: 5px 5px">
-        <img :src="blocks[500].thumbnail" width="35" height="18" />
+        <img :src="blocks[500].thumbnail" width="46" height="24" />
       </div>
       <div class="button" @click="seed(4305)" style="display: inline-flex; padding: 5px 5px">
-        <img :src="blocks[4305].thumbnail" width="35" height="18" />
+        <img :src="blocks[4305].thumbnail" width="46" height="24" />
       </div>
       <div class="button" @click="seed(4124)" style="display: inline-flex; padding: 5px 5px">
-        <img :src="blocks[4124].thumbnail" width="35" height="18" />
+        <img :src="blocks[4124].thumbnail" width="46" height="24" />
       </div>
-      <div class="button" @click="seed(6390)" style="display: inline-flex; padding: 5px 5px">
-        <img :src="blocks[6390].thumbnail" width="35" height="18" />
+      <div class="button" @click="seed(4266)" style="display: inline-flex; padding: 5px 5px">
+        <img :src="blocks[4266].thumbnail" width="46" height="24" />
       </div>
       <div class="button" @click="seed(10104)" style="display: inline-flex; padding: 5px 5px">
-        <img :src="blocks[10104].thumbnail" width="35" height="18" />
+        <img :src="blocks[10104].thumbnail" width="46" height="24" />
       </div>
       <div class="button" @click="seed(6164)" style="display: inline-flex; padding: 5px 5px">
-        <img :src="blocks[6164].thumbnail" width="35" height="18" />
+        <img :src="blocks[6164].thumbnail" width="46" height="24" />
       </div>
       <!--<div class="button" @click="seed(2)">#2</div> -->
     </div>
