@@ -38,6 +38,7 @@
 
 <script>
 
+import _ from 'lodash';
 import * as d3 from 'd3';
 import ImageUtil from '../libs/image-util';
 
@@ -58,6 +59,7 @@ const SAMPLE_RANGE = 25;
 
 const imageCache = new Map();
 
+// eslint-disable-next-line
 async function loadThumbnail(blocks, startIdx, endIdx, width, height) {
   // FIXME use web-workers to speed it up, or preprocess
   const r = [];
@@ -69,14 +71,42 @@ async function loadThumbnail(blocks, startIdx, endIdx, width, height) {
 
     try {
       const d = await ImageUtil.loadImage(blocks[i].thumbnail, { width, height });
-      blocks[i].imageData = d;
-      r.push(blocks[i]);
+      if (!_.isNil(d)) {
+        blocks[i].imageData = d;
+        r.push(blocks[i]);
+      }
     } catch (err) {
       // blocks[i].imageData = null;
     }
   }
   return r;
 }
+
+// eslint-disable-next-line
+async function loadThumbnailsInRange(blocks, range, width, height) {
+  // FIXME use web-workers to speed it up, or preprocess
+  const r = [];
+  for (let i = 0; i < range.length; i++) {
+    const idx = range[i];
+
+    if (blocks[idx].imageData) {
+      r.push(blocks[idx]);
+      continue;
+    }
+
+    try {
+      const d = await ImageUtil.loadImage(blocks[idx].thumbnail, { width, height });
+      if (!_.isNil(d)) {
+        blocks[idx].imageData = d;
+        r.push(blocks[idx]);
+      }
+    } catch (err) {
+      // blocks[i].imageData = null;
+    }
+  }
+  return r;
+}
+
 
 
 async function loadOne(blocks, idx, width, height) {
@@ -116,6 +146,9 @@ export default {
     },
     targetIndex: {
       type: Number
+    },
+    range: {
+      type: Array
     }
   },
   data: () => ({
@@ -139,7 +172,7 @@ export default {
       const blocks = this.blocks;
       const targetIndex = this.targetIndex;
 
-      d3.select('#mosaic-container').selectAll('*').remove();
+      this.collapseTiles();
       d3.select('#target-container').selectAll('*').remove();
       d3.select('#explorer-container').selectAll('*').remove();
       this.exploreBlock = {};
@@ -174,19 +207,38 @@ export default {
       this.targetImageData2X = ctx2.getImageData(0, 0, TARGET_W, TARGET_H);
       this.$emit('ready');
     },
+    async collapseTiles() {
+      d3.select('#mosaic-container').selectAll('.tile2').classed('tile2', false).each(function() {
+        d3.select(this).transition().duration(600 + Math.random() * 200).style('top', 270 + Math.random() * 500 + 'px').remove();
+      });
+    },
     async shuffle() {
       this.showError = false;
       this.$emit('shuffle');
     },
     async createMosaic() {
+      console.log(this.range);
+
+      const indices = [];
+      for (let i = this.range[0]; i <= this.range[1]; i++) {
+        indices.push(i);
+      }
+      const shuffled = _.take(_.shuffle(indices), 50);
+      // console.log(shuffled);
+
+      // return;
       this.$emit('working');
+      this.collapseTiles();
+      // d3.select('#mosaic-container').selectAll('*').remove();
+      d3.select('#explorer-container').selectAll('*').remove();
+
       const blocks = this.blocks;
 
       // 1. Load source images
-      const start = Math.floor(Math.max(0, this.targetIndex - 25));
-      const end = Math.floor(Math.min(blocks.length - 1, this.targetIndex + 25));
+      // const start = Math.floor(Math.max(0, this.targetIndex - 25));
+      // const end = Math.floor(Math.min(blocks.length - 1, this.targetIndex + 25));
 
-      const availableBlocks = await loadThumbnail(blocks, start, end, TILE_W, TILE_H);
+      const availableBlocks = await loadThumbnailsInRange(blocks, shuffled, TILE_W, TILE_H);
       const sourceImages = [];
       for (let i = 0; i < availableBlocks.length; i++) {
         const b = availableBlocks[i];

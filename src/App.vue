@@ -42,6 +42,7 @@
     <Mosaic
       v-if="blocks.length > 0 && targetIndex !== null"
       :targetIndex="targetIndex"
+      :range="[start, end]"
       :blocks="blocks"
       @shuffle="shuffle"
       @error="error"
