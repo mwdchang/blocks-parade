@@ -1,6 +1,17 @@
 <template>
-  <div style="display: flex; border: 1px #434 solid; padding: 10px 10px; justify-content: center">
+    <div>
+      <div style="font-size: 125%; background: #798"
+        class="button"
+        @click="shuffle()">Shuffle Image</div>
+      &nbsp;
+      <div style="font-size: 125%"
+        class="button"
+        @click="createMosaic()">Create Mosaic !!</div>
+    </div>
+
+  <div style="display: flex; padding: 10px 10px; justify-content: center">
     <div style="width: 320px; font-size: 85%">
+      <div v-if="showError === false">{{ targetBlock.description }} {{ targetBlock.idx }}</div>
       <div
         v-if="showError === false"
         id="target-container">
@@ -11,25 +22,13 @@
           <br>Please try a different block.
         </div>
       </div>
-      <!--
-      <div v-if="showError === false">{{ targetBlock.idx }} </div>
-      -->
-      <div v-if="showError === false">{{ targetBlock.description }} </div>
       <div v-if="showError === false"><em><strong>{{ targetBlock.userId }}</strong></em></div>
       <div v-if="showError === false && targetBlock.created_at">{{ targetBlock.created_at.split('T')[0] }} </div>
-      <div style="margin-top: 10px">
-        <div style="font-size: 150%; background: #798"
-          class="button"
-          @click="shuffle()">Shuffle</div>
-        <div style="font-size: 150%"
-          class="button"
-          @click="createMosaic()">Create Mosaic !!</div>
-      </div>
     </div>
     <div id="mosaic-container"></div>
     <div style="width: 320px; font-size: 85%">
-      <div id="explorer-container"></div>
       <div>{{ exploreBlock.description }} </div>
+      <div id="explorer-container"></div>
       <div><em><strong>{{ exploreBlock.userId }}</strong></em></div>
       <div v-if="exploreBlock.created_at">{{ exploreBlock.created_at.split('T')[0] }} </div>
     </div>
@@ -208,8 +207,9 @@ export default {
       this.$emit('ready');
     },
     async collapseTiles() {
+      d3.select('#mosaic-container').select('.help-text').remove();
       d3.select('#mosaic-container').selectAll('.tile2').classed('tile2', false).each(function() {
-        d3.select(this).transition().duration(600 + Math.random() * 200).style('top', 270 + Math.random() * 500 + 'px').remove();
+        d3.select(this).transition().duration(800 + Math.random() * 200).style('top', 270 + Math.random() * 500 + 'px').remove();
       });
     },
     async shuffle() {
@@ -304,7 +304,14 @@ export default {
         .style('left', d => d.left + 'px')
         .style('top', d => d.top + 'px')
         .end();
+
       d3.selectAll('.tile2').classed('flip-z', false).classed('flip-y', false);
+      d3.select('#mosaic-container').append('div')
+        .classed('help-text', true)
+        .style('position', 'absolute')
+        .style('top', '260px')
+        .style('font-size', '85%')
+        .text('Hover on tiles to see previews, click on tiles to go to the original bl.ocks');
     },
     async showTile(tile) {
       this.exploreBlock = tile;

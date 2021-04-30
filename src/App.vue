@@ -1,6 +1,6 @@
 <template>
   <div style="display:flex; flex-direction: column; justify-content: space-evenly">
-    <h3>Blocks Parade
+    <h3>Bl.ocks Parade
       <small style="display:inline-flex; justify-content: center; align-items: center; background: #DDD">
         &nbsp;
         <img height="16" width="16" src="https://cdn.jsdelivr.net/npm/simple-icons@v4/icons/github.svg" />
@@ -12,21 +12,33 @@
       </small>
     </h3>
     <div style="padding: 0 40px; font-size: 85%; margin-top: 10px">
-      Let's celebrating 10 years of D3.js by taking a stroll down memory lane and rediscover your favourite blocks.
+      Let's celebrating 10 years of D3.js by taking a stroll down memory lane and rediscover your favourite bl.ocks.
       Start by using the range slider below to select a time range.
     </div>
-    <div style="padding: 0 40px; font-size: 85%; margin-top: 5px">
+    <div v-if="blocks.length > 0" style="padding: 0 40px; font-size: 85%; margin-top: 5px">
       Or start with one of these examples:
-      <div class="button" @click="seed(32)">#32</div>
-      <div class="button" @click="seed(255)">#255</div>
-      <div class="button" @click="seed(500)">#500</div>
-      <div class="button" @click="seed(1808)">#1808</div>
-      <div class="button" @click="seed(3797)">#3797</div>
-      <div class="button" @click="seed(6390)">#6390</div>
-      <div class="button" @click="seed(10104)">#10104</div>
-      <!--
-      <div class="button" @click="seed(2)">#2</div>
-      -->
+      <div class="button" @click="seed(255)" style="display: inline-flex; padding: 5px 5px">
+        <img :src="blocks[255].thumbnail" width="35" height="18" />
+      </div>
+      <div class="button" @click="seed(500)" style="display: inline-flex; padding: 5px 5px">
+        <img :src="blocks[500].thumbnail" width="35" height="18" />
+      </div>
+      <div class="button" @click="seed(4305)" style="display: inline-flex; padding: 5px 5px">
+        <img :src="blocks[4305].thumbnail" width="35" height="18" />
+      </div>
+      <div class="button" @click="seed(4124)" style="display: inline-flex; padding: 5px 5px">
+        <img :src="blocks[4124].thumbnail" width="35" height="18" />
+      </div>
+      <div class="button" @click="seed(6390)" style="display: inline-flex; padding: 5px 5px">
+        <img :src="blocks[6390].thumbnail" width="35" height="18" />
+      </div>
+      <div class="button" @click="seed(10104)" style="display: inline-flex; padding: 5px 5px">
+        <img :src="blocks[10104].thumbnail" width="35" height="18" />
+      </div>
+      <div class="button" @click="seed(6164)" style="display: inline-flex; padding: 5px 5px">
+        <img :src="blocks[6164].thumbnail" width="35" height="18" />
+      </div>
+      <!--<div class="button" @click="seed(2)">#2</div> -->
     </div>
     <BlockHistory
       v-if="blocks.length > 0"
@@ -35,9 +47,7 @@
       :blocks="blocks"
       @range-changed="rangeChanged"/>
     <p style="padding: 0 40px">
-      There are <span style="font-size: 120%">{{ numBlocksInRange }}</span> blocks in your selected time range!!<br>
-      Click <em>Shuffle</em> to browse them.  click <em>Create Mosaic!!</em>to create a mosaic using the neighouring blocks. <br>
-      Once the mosaic is created, hover over the tiles to see a larger version, click on the tiles to view them on http://bl.ocks.org/
+      There are <span style="font-size: 150%">{{ numBlocksInRange }}</span> bl.ocks in your selected time range!!<br>
     </p>
     <Mosaic
       v-if="blocks.length > 0 && targetIndex !== null"
@@ -48,15 +58,6 @@
       @error="error"
       @working="working"
       @ready="ready" />
-    <!--
-    <div v-if="showError === true">
-      <div style="font-size: 150%; color: #F40">
-        Oops! We cannot find the image for block {{targetBlock.id}}, the data may have been changed or removed :(
-        <br>
-        Please make a different selection.
-      </div>
-    </div>
-    -->
     <div v-if="showOverlay"
       class="overlay">
       <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
@@ -71,12 +72,6 @@ import { ref } from 'vue';
 import BlockHistory from './components/BlockHistory.vue';
 import Mosaic from './components/Mosaic.vue';
 import * as data from './assets/cleaned.json';
-
-// works nicely with mosaic
-// const TARGET_INDEX = 15;
-// const TARGET_INDEX = 55;
-// const TARGET_INDEX = 255;
-// const TARGET_INDEX = 1833;
 
 export default {
   name: 'App',
