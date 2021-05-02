@@ -12,8 +12,8 @@
       </small>
     </h3>
     <div style="padding: 0 40px; font-size: 85%; margin-top: 10px">
-      Let's celebrating 10 years of D3.js by taking a stroll down memory lane and rediscover your favourite bl.ocks.
-      Start by using the range slider below to select a time range.
+      Let's celebrating 10 years of D3.js by taking a stroll down memory lane and rediscover your favourite bl.ocks in creative new ways!.
+      <br>Start by using the range slider below to select a time range.
     </div>
     <div v-if="blocks.length > 0" style="padding: 0 40px; font-size: 85%; margin-top: 5px; margin-bottom: 5px">
       Or start with one of these examples:
