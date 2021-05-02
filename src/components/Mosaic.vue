@@ -11,7 +11,7 @@
 
   <div style="display: flex; padding: 10px 10px; justify-content: center">
     <div style="width: 320px; font-size: 85%">
-      <div v-if="showError === false">{{ targetBlock.description }} {{ targetBlock.idx }}</div>
+      <div v-if="showError === false">{{ targetBlock.description }}</div>
       <div
         v-if="showError === false"
         id="target-container">
@@ -226,7 +226,6 @@ export default {
         indices.push(i);
       }
       const shuffled = _.take(_.shuffle(indices), 50);
-      // console.log(shuffled);
 
       // return;
       this.$emit('working');
@@ -237,9 +236,6 @@ export default {
       const blocks = this.blocks;
 
       // 1. Load source images
-      // const start = Math.floor(Math.max(0, this.targetIndex - 25));
-      // const end = Math.floor(Math.min(blocks.length - 1, this.targetIndex + 25));
-
       const availableBlocks = await loadThumbnailsInRange(blocks, shuffled, TILE_W, TILE_H);
       const sourceImages = [];
       for (let i = 0; i < availableBlocks.length; i++) {

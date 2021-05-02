@@ -85,18 +85,6 @@ export default {
         const start = _.first(values[startGIndex]).idx;
         const end = _.last(values[endGIndex]).idx;
         this.$emit('range-changed', [start, end]);
-
-        /*
-        svg.selectAll('.temp-marker').remove();
-        for (let i = startGIndex; i <= endGIndex; i++) {
-          svg.append('circle')
-            .classed('temp-marker', true)
-            .attr('cx', x(i))
-            .attr('cy', 74)
-            .attr('r', 1.25)
-            .attr('fill', '#eee');
-        }
-        */
       };
       this.brush = d3.brushX()
         .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])

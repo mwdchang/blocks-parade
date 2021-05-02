@@ -17,30 +17,12 @@
     </div>
     <div v-if="blocks.length > 0" style="padding: 0 40px; font-size: 85%; margin-top: 5px; margin-bottom: 5px">
       Or start with one of these examples:
-      <div class="button" @click="seed(4161)" style="display: inline-flex; padding: 5px 5px">
-        <img :src="blocks[4161].thumbnail" width="46" height="24" />
+
+      <div v-for="(ex, i) of examples" :key="i"
+        class="button" @click="seed(ex)" style="display: inline-flex; padding: 5px 5px">
+        <img :src="blocks[ex].thumbnail" width="46" height="24" />
       </div>
-      <div class="button" @click="seed(255)" style="display: inline-flex; padding: 5px 5px">
-        <img :src="blocks[255].thumbnail" width="46" height="24" />
-      </div>
-      <div class="button" @click="seed(500)" style="display: inline-flex; padding: 5px 5px">
-        <img :src="blocks[500].thumbnail" width="46" height="24" />
-      </div>
-      <div class="button" @click="seed(4305)" style="display: inline-flex; padding: 5px 5px">
-        <img :src="blocks[4305].thumbnail" width="46" height="24" />
-      </div>
-      <div class="button" @click="seed(4124)" style="display: inline-flex; padding: 5px 5px">
-        <img :src="blocks[4124].thumbnail" width="46" height="24" />
-      </div>
-      <div class="button" @click="seed(4266)" style="display: inline-flex; padding: 5px 5px">
-        <img :src="blocks[4266].thumbnail" width="46" height="24" />
-      </div>
-      <div class="button" @click="seed(10104)" style="display: inline-flex; padding: 5px 5px">
-        <img :src="blocks[10104].thumbnail" width="46" height="24" />
-      </div>
-      <div class="button" @click="seed(6164)" style="display: inline-flex; padding: 5px 5px">
-        <img :src="blocks[6164].thumbnail" width="46" height="24" />
-      </div>
+
       <!--<div class="button" @click="seed(2)">#2</div> -->
     </div>
     <BlockHistory
@@ -101,7 +83,11 @@ export default {
       showError,
       numBlocksInRange,
       start,
-      end
+      end,
+
+      examples: [
+        4161, 255, 500, 4305, 4124, 4266, 10104, 6164
+      ]
     };
   },
   computed: {
